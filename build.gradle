@@ -1,0 +1,30 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+plugins {
+alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.kotlin.compose) apply false
+}
+
+repositories {
+    mavenCentral()
+}
+
+defaultConfig {
+    applicationId 'com.qualcomm.ftcrobotcontroller'
+    minSdkVersion 24
+    //noinspection ExpiredTargetSdkVersion
+    targetSdkVersion 28
+    multiDexEnabled true
+}
+
+compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+}
+ndk {
+    abiFilters "armeabi-v7a"
+}
+
+ndk {
+    abiFilters "armeabi-v7a"
+}
