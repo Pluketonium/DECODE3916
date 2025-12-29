@@ -1,0 +1,1 @@
+Input abstriction. A series of abstractions over inputs to allow bulk modification of input methods. Example: deadzones. Not will mostly be supplier functions used in control level
