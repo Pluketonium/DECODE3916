@@ -30,9 +30,14 @@
 package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
+import org.firstinspires.ftc.teamcode.baselevel.RobotHardware;
+import org.firstinspires.ftc.teamcode.baselevel.Maxspeed;
+import org.firstinspires.ftc.teamcode.sublevel.Shooter;
+import org.firstinspires.ftc.teamcode.sublevel.Intake;
+import org.firstinspires.ftc.teamcode.sublevel.Feeder;
+import org.firstinspires.ftc.teamcode.toplevel.Scorer;
+import org.firstinspires.ftc.teamcode.input.MecanumDrive;
 
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
@@ -40,89 +45,55 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class Maindrive extends LinearOpMode {
 
     // Declare OpMode members for each of the 4 motors.
-    private ElapsedTime runtime = new ElapsedTime();
-    private DcMotor frontLeftDrive = null;
-    private DcMotor backLeftDrive = null;
-    private DcMotor frontRightDrive = null;
-    private DcMotor backRightDrive = null;
+    ElapsedTime runtime = new ElapsedTime();
+    RobotHardware robot = new RobotHardware();
+    Maxspeed driveMaxSpeed = new Maxspeed();
+    MecanumDrive driveLogic = new MecanumDrive();
+    Scorer scorer;
 
-    private DcMotor shootymotordumb = null;
     Devhelp help = null;
+
     @Override
     public void runOpMode() {
         help = new Devhelp();
-        // Initialize the hardware variables. Note that the strings used here must correspond
-        // to the names assigned during the robot configuration step on the DS or RC devices.
-        frontLeftDrive = hardwareMap.get(DcMotor.class, "front_left");
-        backLeftDrive = hardwareMap.get(DcMotor.class, "back_left");
-        frontRightDrive = hardwareMap.get(DcMotor.class, "front_right");
-        backRightDrive = hardwareMap.get(DcMotor.class, "back_right");
-        shootymotordumb = hardwareMap.get(DcMotor.class,"smd");
-        // ########################################################################################
-        // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
-        // ########################################################################################
-        // Most robots need the motors on one side to be reversed to drive forward.
-        // The motor reversals shown here are for a "direct drive" robot (the wheels turn the same direction as the motor shaft)
-        // If your robot has additional gear reductions or uses a right-angled drive, it's important to ensure
-        // that your motors are turning in the correct direction.  So, start out with the reversals here, BUT
-        // when you first test your robot, push the left joystick forward and observe the direction the wheels turn.
-        // Reverse the direction (flip FORWARD <-> REVERSE ) of any wheel that runs backward
-        // Keep testing until ALL the wheels move the robot forward when you push the left joystick forward.
-        frontLeftDrive.setDirection(DcMotor.Direction.FORWARD);
-        backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
-        frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
-        backRightDrive.setDirection(DcMotor.Direction.REVERSE);
-        //help.bindmotor(hardwareMap,"smd",()->{return gamepad1.a;}, );
-        // Wait for the game to start (driver presses START)
+        robot.init(hardwareMap);
+        Shooter shooter = new Shooter(robot.shooterMotor);
+        Intake intake = new Intake(robot.intakeMotor);
+        Feeder feeder = new Feeder(robot.feedServo);
+        scorer = new Scorer(shooter, intake, feeder);
         telemetry.addData("Status", "Initialized");
         telemetry.update();
-        shootymotordumb.setDirection(DcMotor.Direction.REVERSE);
         waitForStart();
         runtime.reset();
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            double max;
+            driveLogic.calculate(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
 
+            driveMaxSpeed.setMax(driveLogic.frontLeftPower, driveLogic.frontRightPower, driveLogic.backLeftPower, driveLogic.backRightPower);
+            double max = driveMaxSpeed.getMax();
 
-            //shoooty drive
-            boolean shoot = gamepad1.a;
-            shootymotordumb.setPower(shoot?1.0:0.0);
-
-
-            // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-            double axial   = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
-            double lateral =  gamepad1.left_stick_x;
-            double yaw     =  gamepad1.right_stick_x;
-
-
-            double frontLeftPower  = (axial + lateral + yaw)*1.5;
-            double frontRightPower = (axial - lateral - yaw)*1;
-            double backLeftPower   = (axial - lateral + yaw)*1.3;
-            double backRightPower  = (axial + lateral - yaw)*1;
-
-            //limit to prevent explosions
-            max = Math.max(Math.abs(frontLeftPower), Math.abs(frontRightPower));
-            max = Math.max(max, Math.abs(backLeftPower));
-            max = Math.max(max, Math.abs(backRightPower));
 
             if (max > 1.0) {
-                frontLeftPower  /= max;
-                frontRightPower /= max;
-                backLeftPower   /= max;
-                backRightPower  /= max;
+                driveLogic.frontLeftPower /= max;
+                driveLogic.frontRightPower /= max;
+                driveLogic.backLeftPower /= max;
+                driveLogic.backRightPower /= max;
             }
 
             // Send calculated power to wheels
-            frontLeftDrive.setPower(frontLeftPower);
-            frontRightDrive.setPower(frontRightPower);
-            backLeftDrive.setPower(backLeftPower);
-            backRightDrive.setPower(backRightPower);
+            robot.frontLeft.setPower(driveLogic.frontLeftPower);
+            robot.frontRight.setPower(driveLogic.frontRightPower);
+            robot.backLeft.setPower(driveLogic.backLeftPower);
+            robot.backRight.setPower(driveLogic.backRightPower);
+
+            scorer.update(gamepad1.yWasPressed(), gamepad1.right_trigger, gamepad1.left_trigger);
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Front left/Right", "%4.2f, %4.2f", frontLeftPower, frontRightPower);
-            telemetry.addData("Back  left/Right", "%4.2f, %4.2f", backLeftPower, backRightPower);
+            telemetry.addData("Front left/Right", "%4.2f, %4.2f", driveLogic.frontLeftPower, driveLogic.frontRightPower);
+            telemetry.addData("Back left/Right", "%4.2f, %4.2f", driveLogic.backLeftPower, driveLogic.backRightPower);
             telemetry.update();
         }
-    }}
+    }
+}
