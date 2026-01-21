@@ -1,46 +1,19 @@
-/* Copyright (c) 2021 FIRST. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted (subject to the limitations in the disclaimer below) provided that
- * the following conditions are met:
- *
- * Redistributions of source code must retain the above copyright notice, this list
- * of conditions and the following disclaimer.
- *
- * Redistributions in binary form must reproduce the above copyright notice, this
- * list of conditions and the following disclaimer in the documentation and/or
- * other materials provided with the distribution.
- *
- * Neither the name of FIRST nor the names of its contributors may be used to endorse or
- * promote products derived from this software without specific prior written permission.
- *
- * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS
- * LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.toplevel;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+import org.firstinspires.ftc.teamcode.Temp.Devhelp;
 import org.firstinspires.ftc.teamcode.baselevel.RobotHardware;
 import org.firstinspires.ftc.teamcode.baselevel.Maxspeed;
 import org.firstinspires.ftc.teamcode.sublevel.Shooter;
 import org.firstinspires.ftc.teamcode.sublevel.Intake;
 import org.firstinspires.ftc.teamcode.sublevel.Feeder;
-import org.firstinspires.ftc.teamcode.toplevel.Scorer;
 import org.firstinspires.ftc.teamcode.input.MecanumDrive;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-
+import org.firstinspires.ftc.teamcode.sublevel.Shooter;
 @TeleOp(name="Maindrive")
 public class Maindrive extends LinearOpMode {
 
@@ -50,7 +23,7 @@ public class Maindrive extends LinearOpMode {
     Maxspeed driveMaxSpeed = new Maxspeed();
     MecanumDrive driveLogic = new MecanumDrive();
     Scorer scorer;
-
+    Boolean toshot = false;
     Devhelp help = null;
 
     @Override
@@ -68,6 +41,17 @@ public class Maindrive extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
+
+            //temp code start!
+            robot.angleshot.setPosition(robot.angleshot.getPosition()+(gamepad1.dpad_up?0.001:0.0)-(gamepad1.dpad_down?0.001:0.0));
+            robot.shootservo.setPosition(robot.shootservo.getPosition()+(gamepad1.dpad_right?0.001:0.0)-(gamepad1.dpad_left?0.001:0.0));
+            robot.contshoot.setPower((gamepad1.dpad_right?0.5:0.0)-(gamepad1.dpad_left?0.5:0.0));
+
+            robot.shootservo.
+
+
+            //temp code end :<
+
             driveLogic.calculate(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
 
             driveMaxSpeed.setMax(driveLogic.frontLeftPower, driveLogic.frontRightPower, driveLogic.backLeftPower, driveLogic.backRightPower);
@@ -87,9 +71,11 @@ public class Maindrive extends LinearOpMode {
             robot.backLeft.setPower(driveLogic.backLeftPower);
             robot.backRight.setPower(driveLogic.backRightPower);
 
-            scorer.update(gamepad1.yWasPressed(), gamepad1.right_trigger, gamepad1.left_trigger);
-
+            if (gamepad1.yWasPressed()){toshot=!toshot;}
+            //update everything
+            scorer.update(toshot, gamepad1.right_trigger, gamepad1.left_trigger);
             // Show the elapsed game time and wheel power.
+            telemetry.addData("shoot",toshot);
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", driveLogic.frontLeftPower, driveLogic.frontRightPower);
             telemetry.addData("Back left/Right", "%4.2f, %4.2f", driveLogic.backLeftPower, driveLogic.backRightPower);
