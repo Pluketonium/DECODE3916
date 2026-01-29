@@ -50,18 +50,18 @@ public class Maindrive extends LinearOpMode {
     RobotHardware robot = new RobotHardware();
     Maxspeed driveMaxSpeed = new Maxspeed();
     MecanumDrive driveLogic = new MecanumDrive();
-    Rotate rotateThingy = new Rotate();
+
     Scorer scorer;
     Autonomous autonomous;
-    Devhelp help = null;
 
     @Override
     public void runOpMode() {
-        help = new Devhelp();
         robot.init(hardwareMap);
         Shooter shooter = new Shooter(robot.shooterMotor);
         Intake intake = new Intake(robot.intakeMotor);
+        Rotate rotate = new Rotate();
         scorer = new Scorer(shooter, intake);
+        autonomous = new Autonomous(intake, shooter, rotate);
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
@@ -75,7 +75,7 @@ public class Maindrive extends LinearOpMode {
             double max = driveMaxSpeed.getMax();
 
             if (gamepad1.xWasPressed()) {
-                rotateThingy.rotateRobot(90);
+                rotate.rotateRobot(90);
             }
 
 
@@ -92,7 +92,7 @@ public class Maindrive extends LinearOpMode {
             robot.backLeft.setPower(driveLogic.backLeftPower);
             robot.backRight.setPower(driveLogic.backRightPower);
 
-            scorer.update(gamepad1.y, gamepad1.right_trigger, gamepad1.left_trigger);
+            scorer.update(gamepad1.y, gamepad1.right_trigger);
             autonomous.update();
 
             // Show the elapsed game time and wheel power.

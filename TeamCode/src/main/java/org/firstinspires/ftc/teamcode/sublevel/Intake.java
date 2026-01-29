@@ -10,7 +10,7 @@ public class Intake {
         this.intakeMotor = motor;
     }
 
-    public void update(double rightTrigger, double leftTrigger) {
+    public void update(double rightTrigger) {
         if (rightTrigger > 0.1) {
             intakeMotor.setPower(rightTrigger);
         } else {
