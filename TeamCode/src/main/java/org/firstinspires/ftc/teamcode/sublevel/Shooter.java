@@ -8,7 +8,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class Shooter {
     private DcMotor shooterMotor;
     private ElapsedTime timer = new ElapsedTime();
-
     private boolean inSpinningSequence = false;
     private double currentPower = 0;
 

@@ -28,7 +28,6 @@ public class RobotHardware {
         backRight = myHardwareMap.get(DcMotor.class, "back_right");
         shooterMotor = myHardwareMap.get(DcMotor.class, "smd");
         intakeMotor = myHardwareMap.get(DcMotor.class, "intake");
-        feedServo = myHardwareMap.get(CRServo.class, "feeder");
 
         frontLeft.setDirection(DcMotor.Direction.FORWARD);
         backLeft.setDirection(DcMotor.Direction.REVERSE);
@@ -44,6 +43,5 @@ public class RobotHardware {
         backRight.setPower(0.0);
         shooterMotor.setPower(0.0);
         intakeMotor.setPower(0.0);
-        feedServo.setPower(0.0);
     }
 }

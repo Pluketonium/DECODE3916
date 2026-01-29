@@ -34,8 +34,9 @@ import org.firstinspires.ftc.teamcode.baselevel.RobotHardware;
 import org.firstinspires.ftc.teamcode.baselevel.Maxspeed;
 import org.firstinspires.ftc.teamcode.sublevel.Shooter;
 import org.firstinspires.ftc.teamcode.sublevel.Intake;
-import org.firstinspires.ftc.teamcode.sublevel.Feeder;
+import org.firstinspires.ftc.teamcode.toplevel.Autonomous;
 import org.firstinspires.ftc.teamcode.toplevel.Scorer;
+import org.firstinspires.ftc.teamcode.sublevel.Rotate;
 import org.firstinspires.ftc.teamcode.input.MecanumDrive;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -49,8 +50,9 @@ public class Maindrive extends LinearOpMode {
     RobotHardware robot = new RobotHardware();
     Maxspeed driveMaxSpeed = new Maxspeed();
     MecanumDrive driveLogic = new MecanumDrive();
+    Rotate rotateThingy = new Rotate();
     Scorer scorer;
-
+    Autonomous autonomous;
     Devhelp help = null;
 
     @Override
@@ -59,8 +61,7 @@ public class Maindrive extends LinearOpMode {
         robot.init(hardwareMap);
         Shooter shooter = new Shooter(robot.shooterMotor);
         Intake intake = new Intake(robot.intakeMotor);
-        Feeder feeder = new Feeder(robot.feedServo);
-        scorer = new Scorer(shooter, intake, feeder);
+        scorer = new Scorer(shooter, intake);
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
@@ -72,6 +73,10 @@ public class Maindrive extends LinearOpMode {
 
             driveMaxSpeed.setMax(driveLogic.frontLeftPower, driveLogic.frontRightPower, driveLogic.backLeftPower, driveLogic.backRightPower);
             double max = driveMaxSpeed.getMax();
+
+            if (gamepad1.xWasPressed()) {
+                rotateThingy.rotateRobot(90);
+            }
 
 
             if (max > 1.0) {
@@ -87,7 +92,8 @@ public class Maindrive extends LinearOpMode {
             robot.backLeft.setPower(driveLogic.backLeftPower);
             robot.backRight.setPower(driveLogic.backRightPower);
 
-            scorer.update(gamepad1.yWasPressed(), gamepad1.right_trigger, gamepad1.left_trigger);
+            scorer.update(gamepad1.y, gamepad1.right_trigger, gamepad1.left_trigger);
+            autonomous.update();
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
