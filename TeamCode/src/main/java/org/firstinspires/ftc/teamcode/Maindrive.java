@@ -48,6 +48,7 @@ public class Maindrive extends LinearOpMode {
     // Declare OpMode members for each of the 4 motors.
     ElapsedTime runtime = new ElapsedTime();
     RobotHardware robot = new RobotHardware();
+    Rotate rotate = new Rotate(robot);
     Maxspeed driveMaxSpeed = new Maxspeed();
     MecanumDrive driveLogic = new MecanumDrive();
 
@@ -59,7 +60,6 @@ public class Maindrive extends LinearOpMode {
         robot.init(hardwareMap);
         Shooter shooter = new Shooter(robot.shooterMotor);
         Intake intake = new Intake(robot.intakeMotor);
-        Rotate rotate = new Rotate();
         scorer = new Scorer(shooter, intake);
         autonomous = new Autonomous(intake, shooter, rotate);
         telemetry.addData("Status", "Initialized");
@@ -74,8 +74,8 @@ public class Maindrive extends LinearOpMode {
             driveMaxSpeed.setMax(driveLogic.frontLeftPower, driveLogic.frontRightPower, driveLogic.backLeftPower, driveLogic.backRightPower);
             double max = driveMaxSpeed.getMax();
 
-            if (gamepad1.xWasPressed()) {
-                rotate.rotateRobot(90);
+            if (gamepad1.x) {
+                rotate.rotateToAngle(90,0.5);
             }
 
 

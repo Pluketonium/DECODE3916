@@ -3,6 +3,9 @@ package org.firstinspires.ftc.teamcode.baselevel;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.hardware.IMU;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 public class RobotHardware {
     // declare da hardware
@@ -19,6 +22,8 @@ public class RobotHardware {
     public DcMotor intakeMotor = null;
 
     public CRServo feedServo = null;
+
+    public IMU imu;
 
     public void init(HardwareMap myHardwareMap) {
 
@@ -43,5 +48,11 @@ public class RobotHardware {
         backRight.setPower(0.0);
         shooterMotor.setPower(0.0);
         intakeMotor.setPower(0.0);
+
+        imu = myHardwareMap.get(IMU.class, "imu");
+        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
+                RevHubOrientationOnRobot.LogoFacingDirection.UP,
+                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
+        imu.initialize(parameters);
     }
 }
