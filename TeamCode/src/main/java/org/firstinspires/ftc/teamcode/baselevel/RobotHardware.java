@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.baselevel;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
@@ -21,7 +22,11 @@ public class RobotHardware {
 
     public DcMotor intakeMotor = null;
 
-    public CRServo feedServo = null;
+    public CRServo feed = null;
+
+    public CRServo aim1 = null;
+
+    public CRServo aim2 = null;
 
     public IMU imu;
 
@@ -33,6 +38,9 @@ public class RobotHardware {
         backRight = myHardwareMap.get(DcMotor.class, "back_right");
         shooterMotor = myHardwareMap.get(DcMotor.class, "smd");
         intakeMotor = myHardwareMap.get(DcMotor.class, "intake");
+        aim1 = myHardwareMap.get(CRServo.class, "aim1");
+        aim2 = myHardwareMap.get(CRServo.class, "aim2");
+        feed = myHardwareMap.get(CRServo.class, "feed");
 
         frontLeft.setDirection(DcMotor.Direction.FORWARD);
         backLeft.setDirection(DcMotor.Direction.REVERSE);
@@ -40,6 +48,11 @@ public class RobotHardware {
         backRight.setDirection(DcMotor.Direction.REVERSE);
         shooterMotor.setDirection(DcMotor.Direction.REVERSE);
         intakeMotor.setDirection(DcMotor.Direction.FORWARD);
+        aim1.setDirection(DcMotorSimple.Direction.FORWARD);
+        aim2.setDirection(DcMotorSimple.Direction.FORWARD);
+        feed.setDirection(DcMotorSimple.Direction.FORWARD);
+
+
 
         // stop motors for safety
         frontLeft.setPower(0.0);
@@ -48,6 +61,9 @@ public class RobotHardware {
         backRight.setPower(0.0);
         shooterMotor.setPower(0.0);
         intakeMotor.setPower(0.0);
+        aim1.setPower(0.0);
+        aim2.setPower(0.0);
+        feed.setPower(0.0);
 
         imu = myHardwareMap.get(IMU.class, "imu");
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(

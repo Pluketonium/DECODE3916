@@ -32,6 +32,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.baselevel.RobotHardware;
 import org.firstinspires.ftc.teamcode.baselevel.Maxspeed;
+import org.firstinspires.ftc.teamcode.sublevel.Aim;
 import org.firstinspires.ftc.teamcode.sublevel.Shooter;
 import org.firstinspires.ftc.teamcode.sublevel.Intake;
 import org.firstinspires.ftc.teamcode.toplevel.Autonomous;
@@ -52,6 +53,10 @@ public class Maindrive extends LinearOpMode {
     Maxspeed driveMaxSpeed = new Maxspeed();
     MecanumDrive driveLogic = new MecanumDrive();
 
+    // I HATE BOOLEANS
+    boolean lastYState = false;
+    boolean shooterToggled = false;
+
     Scorer scorer;
     Autonomous autonomous;
 
@@ -60,6 +65,7 @@ public class Maindrive extends LinearOpMode {
         robot.init(hardwareMap);
         Shooter shooter = new Shooter(robot.shooterMotor);
         Intake intake = new Intake(robot.intakeMotor);
+        Aim aim = new Aim(robot.aim1, robot.aim2);
         scorer = new Scorer(shooter, intake);
         autonomous = new Autonomous(intake, shooter, rotate);
         telemetry.addData("Status", "Initialized");
@@ -92,7 +98,11 @@ public class Maindrive extends LinearOpMode {
             robot.backLeft.setPower(driveLogic.backLeftPower);
             robot.backRight.setPower(driveLogic.backRightPower);
 
-            scorer.update(gamepad1.y, gamepad1.right_trigger);
+            if (gamepad1.y && !lastYState) {
+                shooterToggled = !shooterToggled;
+            }
+            lastYState = gamepad1.y;
+            scorer.update(shooterToggled, gamepad1.right_trigger, gamepad1.left_trigger);
             autonomous.update();
 
             // Show the elapsed game time and wheel power.
